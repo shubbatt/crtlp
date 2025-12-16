@@ -12,7 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (DB::getDriverName() === 'sqlite') {
+        $driver = DB::getDriverName();
+        
+        if ($driver === 'sqlite') {
             // SQLite doesn't support ALTER COLUMN for enum, need to recreate
             DB::statement('
                 CREATE TABLE service_jobs_new (
@@ -48,10 +50,17 @@ return new class extends Migration
             DB::statement('CREATE INDEX service_jobs_status_due_date_index ON service_jobs (status, due_date)');
             DB::statement('CREATE INDEX service_jobs_assigned_to_index ON service_jobs (assigned_to)');
             DB::statement('CREATE INDEX service_jobs_priority_index ON service_jobs (priority)');
-        } else {
-            // For MySQL/PostgreSQL, use ALTER TABLE
+        } elseif ($driver === 'pgsql') {
+            // PostgreSQL: Drop constraint, add new constraint with DELIVERED
+            DB::statement("ALTER TABLE service_jobs DROP CONSTRAINT IF EXISTS service_jobs_status_check");
+            DB::statement("ALTER TABLE service_jobs ADD CONSTRAINT service_jobs_status_check CHECK (status::text = ANY (ARRAY['PENDING'::text, 'ACCEPTED'::text, 'ASSIGNED'::text, 'IN_PROGRESS'::text, 'ON_HOLD'::text, 'QA_REVIEW'::text, 'COMPLETED'::text, 'REJECTED'::text, 'CANCELLED'::text, 'DELIVERED'::text]))");
+            // Add delivered_at column
             Schema::table('service_jobs', function (Blueprint $table) {
-                // MySQL: Need to modify enum
+                $table->timestamp('delivered_at')->nullable();
+            });
+        } else {
+            // For MySQL, use MODIFY with ENUM
+            Schema::table('service_jobs', function (Blueprint $table) {
                 DB::statement("ALTER TABLE service_jobs MODIFY COLUMN status ENUM('PENDING', 'ACCEPTED', 'ASSIGNED', 'IN_PROGRESS', 'ON_HOLD', 'QA_REVIEW', 'COMPLETED', 'REJECTED', 'CANCELLED', 'DELIVERED') DEFAULT 'PENDING'");
                 $table->timestamp('delivered_at')->nullable()->after('completed_at');
             });
@@ -97,6 +106,13 @@ return new class extends Migration
             DB::statement('CREATE INDEX service_jobs_status_due_date_index ON service_jobs (status, due_date)');
             DB::statement('CREATE INDEX service_jobs_assigned_to_index ON service_jobs (assigned_to)');
             DB::statement('CREATE INDEX service_jobs_priority_index ON service_jobs (priority)');
+        } elseif (DB::getDriverName() === 'pgsql') {
+            // PostgreSQL: revert constraint and drop delivered_at
+            Schema::table('service_jobs', function (Blueprint $table) {
+                $table->dropColumn('delivered_at');
+            });
+            DB::statement("ALTER TABLE service_jobs DROP CONSTRAINT IF EXISTS service_jobs_status_check");
+            DB::statement("ALTER TABLE service_jobs ADD CONSTRAINT service_jobs_status_check CHECK (status::text = ANY (ARRAY['PENDING'::text, 'ACCEPTED'::text, 'ASSIGNED'::text, 'IN_PROGRESS'::text, 'ON_HOLD'::text, 'QA_REVIEW'::text, 'COMPLETED'::text, 'REJECTED'::text, 'CANCELLED'::text]))");
         } else {
             Schema::table('service_jobs', function (Blueprint $table) {
                 $table->dropColumn('delivered_at');

@@ -12,7 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (DB::getDriverName() === 'sqlite') {
+        $driver = DB::getDriverName();
+        
+        if ($driver === 'sqlite') {
             // SQLite doesn't support ALTER COLUMN for enum, need to recreate
             DB::statement('
                 CREATE TABLE service_jobs_new (
@@ -47,12 +49,15 @@ return new class extends Migration
             DB::statement('CREATE INDEX service_jobs_status_due_date_index ON service_jobs (status, due_date)');
             DB::statement('CREATE INDEX service_jobs_assigned_to_index ON service_jobs (assigned_to)');
             DB::statement('CREATE INDEX service_jobs_priority_index ON service_jobs (priority)');
+        } elseif ($driver === 'pgsql') {
+            // PostgreSQL: Drop constraint, add new constraint with CANCELLED
+            // First drop any existing check constraint
+            DB::statement("ALTER TABLE service_jobs DROP CONSTRAINT IF EXISTS service_jobs_status_check");
+            // Add new constraint including CANCELLED
+            DB::statement("ALTER TABLE service_jobs ADD CONSTRAINT service_jobs_status_check CHECK (status::text = ANY (ARRAY['PENDING'::text, 'ACCEPTED'::text, 'ASSIGNED'::text, 'IN_PROGRESS'::text, 'ON_HOLD'::text, 'QA_REVIEW'::text, 'COMPLETED'::text, 'REJECTED'::text, 'CANCELLED'::text]))");
         } else {
-            // For MySQL/PostgreSQL, use ALTER TABLE
-            Schema::table('service_jobs', function (Blueprint $table) {
-                // MySQL: Need to modify enum
-                DB::statement("ALTER TABLE service_jobs MODIFY COLUMN status ENUM('PENDING', 'ACCEPTED', 'ASSIGNED', 'IN_PROGRESS', 'ON_HOLD', 'QA_REVIEW', 'COMPLETED', 'REJECTED', 'CANCELLED') DEFAULT 'PENDING'");
-            });
+            // For MySQL, use MODIFY with ENUM
+            DB::statement("ALTER TABLE service_jobs MODIFY COLUMN status ENUM('PENDING', 'ACCEPTED', 'ASSIGNED', 'IN_PROGRESS', 'ON_HOLD', 'QA_REVIEW', 'COMPLETED', 'REJECTED', 'CANCELLED') DEFAULT 'PENDING'");
         }
     }
 
@@ -95,6 +100,10 @@ return new class extends Migration
             DB::statement('CREATE INDEX service_jobs_status_due_date_index ON service_jobs (status, due_date)');
             DB::statement('CREATE INDEX service_jobs_assigned_to_index ON service_jobs (assigned_to)');
             DB::statement('CREATE INDEX service_jobs_priority_index ON service_jobs (priority)');
+        } elseif (DB::getDriverName() === 'pgsql') {
+            // PostgreSQL: revert constraint
+            DB::statement("ALTER TABLE service_jobs DROP CONSTRAINT IF EXISTS service_jobs_status_check");
+            DB::statement("ALTER TABLE service_jobs ADD CONSTRAINT service_jobs_status_check CHECK (status::text = ANY (ARRAY['PENDING'::text, 'ACCEPTED'::text, 'ASSIGNED'::text, 'IN_PROGRESS'::text, 'ON_HOLD'::text, 'QA_REVIEW'::text, 'COMPLETED'::text, 'REJECTED'::text]))");
         } else {
             DB::statement("ALTER TABLE service_jobs MODIFY COLUMN status ENUM('PENDING', 'ACCEPTED', 'ASSIGNED', 'IN_PROGRESS', 'ON_HOLD', 'QA_REVIEW', 'COMPLETED', 'REJECTED') DEFAULT 'PENDING'");
         }
