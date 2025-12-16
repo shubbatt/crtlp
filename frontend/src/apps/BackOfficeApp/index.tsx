@@ -12,7 +12,7 @@ interface ServiceJob {
     priority: string;
     due_date: string | null;
     completed_at?: string | null;
-    order?: { 
+    order?: {
         order_number: string;
         customer?: { name: string };
     };
@@ -74,12 +74,12 @@ const BackOfficeBoard: React.FC = () => {
             const payload: { status: string; reason?: string } = {
                 status: newStatus
             };
-            
+
             // Only include reason if it's provided and not empty
             if (reason && reason.trim()) {
                 payload.reason = reason.trim();
             }
-            
+
             await apiClient.patch(API_ENDPOINTS.SERVICE_STATUS(jobId), payload);
             fetchAllJobs();
         } catch (error: any) {
@@ -98,7 +98,7 @@ const BackOfficeBoard: React.FC = () => {
         // For PENDING jobs, reject moves them to CANCELLED status
         // For QA_REVIEW jobs, reject moves them back to IN_PROGRESS (handled by backend)
         const newStatus = rejectingJob.status === 'PENDING' ? 'CANCELLED' : 'REJECTED';
-        
+
         updateStatus(rejectingJob.id, newStatus, rejectReason);
         setShowRejectModal(false);
         setRejectingJob(null);
@@ -113,7 +113,7 @@ const BackOfficeBoard: React.FC = () => {
 
     const getJobsByStatus = (status: string) => {
         let jobs = allJobs.filter(job => job.status === status);
-        
+
         // Apply search filter if search term exists
         if (searchTerm.trim()) {
             const term = searchTerm.toLowerCase().trim();
@@ -121,19 +121,19 @@ const BackOfficeBoard: React.FC = () => {
                 // Search by job number
                 const jobNumber = job.job_number?.toLowerCase() || '';
                 if (jobNumber.includes(term)) return true;
-                
+
                 // Search by order number
                 const orderNumber = job.order?.order_number?.toLowerCase() || '';
                 if (orderNumber.includes(term)) return true;
-                
+
                 // Search by customer name
                 const customerName = job.order?.customer?.name?.toLowerCase() || '';
                 if (customerName.includes(term)) return true;
-                
+
                 return false;
             });
         }
-        
+
         // Sort completed jobs in descending order (most recent first)
         if (status === 'COMPLETED') {
             jobs.sort((a, b) => {
@@ -142,7 +142,7 @@ const BackOfficeBoard: React.FC = () => {
                 return dateB - dateA; // Descending order
             });
         }
-        
+
         return jobs;
     };
 
@@ -251,8 +251,8 @@ const BackOfficeBoard: React.FC = () => {
                                     <div className="empty-column">No jobs</div>
                                 ) : (
                                     columnJobs.map(job => (
-                                        <div 
-                                            key={job.id} 
+                                        <div
+                                            key={job.id}
                                             className="kanban-card"
                                             onClick={() => navigate(`/backoffice/jobs/${job.id}`)}
                                             style={{ cursor: 'pointer' }}
@@ -268,9 +268,9 @@ const BackOfficeBoard: React.FC = () => {
 
                                             <div className="card-body">
                                                 <div className="product-name">
-                                                    {(job.orderItem || job.order_item)?.product?.name || 
-                                                     (job.orderItem || job.order_item)?.description || 
-                                                     'Item'}
+                                                    {(job.orderItem || job.order_item)?.product?.name ||
+                                                        (job.orderItem || job.order_item)?.description ||
+                                                        'Item'}
                                                 </div>
                                                 <div className="order-ref">
                                                     📦 {job.order?.order_number || 'N/A'}
@@ -296,7 +296,7 @@ const BackOfficeBoard: React.FC = () => {
                                                 {getPrevStatus(job.status) && (
                                                     <button
                                                         className="btn-move prev"
-                                                        onClick={(e) => updateStatus(job.id, getPrevStatus(job.status)!, undefined, e)}
+                                                        onClick={() => updateStatus(job.id, getPrevStatus(job.status)!)}
                                                         title="Move back"
                                                     >
                                                         ← Back
@@ -305,7 +305,7 @@ const BackOfficeBoard: React.FC = () => {
                                                 {getNextStatus(job.status) && (
                                                     <button
                                                         className="btn-move next"
-                                                        onClick={(e) => updateStatus(job.id, getNextStatus(job.status)!, undefined, e)}
+                                                        onClick={() => updateStatus(job.id, getNextStatus(job.status)!)}
                                                         title="Move forward"
                                                     >
                                                         Next →
@@ -355,7 +355,7 @@ const BackOfficeBoard: React.FC = () => {
                         </p>
                         <p className="product-ref">
                             {(rejectingJob.orderItem || rejectingJob.order_item)?.product?.name ||
-                             (rejectingJob.orderItem || rejectingJob.order_item)?.description}
+                                (rejectingJob.orderItem || rejectingJob.order_item)?.description}
                         </p>
 
                         <div className="form-group">
@@ -363,8 +363,8 @@ const BackOfficeBoard: React.FC = () => {
                             <textarea
                                 value={rejectReason}
                                 onChange={(e) => setRejectReason(e.target.value)}
-                                placeholder={rejectingJob.status === 'PENDING' 
-                                    ? "Enter reason for rejecting this job..." 
+                                placeholder={rejectingJob.status === 'PENDING'
+                                    ? "Enter reason for rejecting this job..."
                                     : "Describe the issue that caused QA failure..."}
                                 rows={4}
                             />
