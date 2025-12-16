@@ -92,7 +92,7 @@ static_sites:
       deploy_on_push: true
     
     build_command: npm ci && npm run build
-    output_dir: /dist
+    output_dir: dist
     
     # SPA routing configuration
     routes:
