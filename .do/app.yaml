@@ -91,11 +91,17 @@ static_sites:
       branch: main
       deploy_on_push: true
     
-    build_command: npm install && npm run build
-    output_dir: dist
+    build_command: npm ci && npm run build
+    output_dir: /dist
+    
+    # SPA routing configuration
+    routes:
+      - path: /
+        preserve_path_prefix: false
     
     # Catch-all route for SPA
     catchall_document: index.html
+    error_document: index.html
     
     # Environment variables
     envs:
