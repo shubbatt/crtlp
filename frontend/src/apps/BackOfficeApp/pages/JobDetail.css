@@ -1,0 +1,379 @@
+.job-detail {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+.job-detail-loading,
+.job-detail-error {
+    padding: 40px;
+    text-align: center;
+    font-size: 18px;
+    color: #666;
+}
+
+.detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.btn-back {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    transition: all 0.2s;
+}
+
+.btn-back:hover {
+    background: #e5e5e5;
+    border-color: #bbb;
+}
+
+.header-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-info h1 {
+    margin: 0;
+    font-size: 28px;
+    color: #333;
+}
+
+.status-badge {
+    padding: 6px 16px;
+    border-radius: 20px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.detail-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.info-section {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.info-section h2 {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    color: #333;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 10px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-item .label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+}
+
+.info-item .value {
+    font-size: 16px;
+    color: #333;
+}
+
+.status-value,
+.priority-value {
+    font-weight: 600;
+}
+
+.order-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.order-link:hover {
+    text-decoration: underline;
+}
+
+.notes-section {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.notes-textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.notes-textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.btn-save-notes {
+    align-self: flex-start;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: transform 0.2s;
+}
+
+.btn-save-notes:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.btn-save-notes:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.current-notes {
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.current-notes strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.current-notes p {
+    margin: 0;
+    color: #666;
+    white-space: pre-wrap;
+}
+
+.comments-timeline {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.comment-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.comment-user {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+.comment-date {
+    font-size: 12px;
+    color: #666;
+}
+
+.comment-content {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.comment-divider {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 15px 0 0 0;
+}
+
+.status-history {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.history-item {
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.history-status {
+    font-weight: 600;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+.history-date {
+    font-size: 12px;
+    color: #666;
+}
+
+.history-user {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.history-reason {
+    font-size: 14px;
+    color: #333;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.history-divider {
+    height: 1px;
+    background: #e0e0e0;
+    margin: 15px 0;
+}
+
+.order-details {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.order-items-table {
+    margin-top: 20px;
+}
+
+.order-items-table h3 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.order-items-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.order-items-table th,
+.order-items-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.order-items-table th {
+    background: #f5f5f5;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #666;
+}
+
+.order-items-table tfoot tr.grand-total {
+    border-top: 2px solid #333;
+}
+
+.order-items-table tfoot tr.grand-total td {
+    font-size: 18px;
+    padding-top: 15px;
+}
+
+.order-notes {
+    margin-top: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.order-notes strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.order-notes p {
+    margin: 0;
+    color: #666;
+    white-space: pre-wrap;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .job-detail {
+        padding: 15px;
+    }
+
+    .detail-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .header-info {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .order-items-table {
+        overflow-x: auto;
+    }
+
+    .order-items-table table {
+        min-width: 500px;
+    }
+}
+

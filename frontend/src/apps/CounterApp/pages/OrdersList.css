@@ -1,0 +1,170 @@
+.orders-list {
+    padding: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+.orders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.orders-header h1 {
+    font-size: 28px;
+    color: #333;
+    margin: 0 0 24px 0;
+    font-weight: 600;
+}
+
+.btn-new {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: transform 0.2s;
+}
+
+.btn-new:hover {
+    transform: translateY(-2px);
+}
+
+.filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.status-filter {
+    padding: 10px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    min-width: 180px;
+}
+
+.btn-refresh {
+    padding: 10px 16px;
+    background: #f5f5f5;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-refresh:hover {
+    background: #eee;
+}
+
+.loading,
+.empty {
+    text-align: center;
+    padding: 60px;
+    color: #666;
+    font-size: 16px;
+}
+
+.orders-table {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.orders-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.orders-table th {
+    background: #f8f9fa;
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 13px;
+    text-transform: uppercase;
+    color: #666;
+    font-weight: 600;
+}
+
+.orders-table td {
+    padding: 16px;
+    border-top: 1px solid #eee;
+    font-size: 14px;
+}
+
+.orders-table tr:hover {
+    background: #f8f9fa;
+}
+
+.order-number {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.amount {
+    font-weight: 600;
+    font-family: 'Monaco', monospace;
+}
+
+.amount.due {
+    color: #ef4444;
+}
+
+.date {
+    color: #666;
+    font-size: 13px;
+}
+
+@media (max-width: 768px) {
+    .orders-list {
+        padding: 20px 16px;
+    }
+
+    .orders-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .orders-header h1 {
+        font-size: 24px;
+    }
+
+    .filters {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .status-filter,
+    .btn-refresh {
+        width: 100%;
+    }
+
+    .orders-table-container {
+        overflow-x: auto;
+    }
+
+    .orders-table {
+        min-width: 600px;
+    }
+
+    .orders-table th,
+    .orders-table td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+}

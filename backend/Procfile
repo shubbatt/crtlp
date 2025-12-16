@@ -1,0 +1,1 @@
+web: php artisan migrate --force && heroku-php-nginx -C nginx.conf public/

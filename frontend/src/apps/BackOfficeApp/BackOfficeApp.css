@@ -1,0 +1,391 @@
+.kanban-board {
+    padding: 20px;
+    height: calc(100vh - 80px);
+    display: flex;
+    flex-direction: column;
+    background: #f0f2f5;
+}
+
+.kanban-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 10px;
+}
+
+.kanban-header h1 {
+    font-size: 24px;
+    color: #333;
+    margin: 0;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.job-count {
+    font-size: 14px;
+    color: #666;
+    background: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+}
+
+.btn-refresh {
+    padding: 10px 20px;
+    background: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.kanban-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    gap: 20px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e0e0e0;
+    border-top-color: #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Columns */
+.kanban-columns {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+
+.kanban-column {
+    flex: 0 0 280px;
+    background: #e8eaed;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+}
+
+.column-header {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 4px solid;
+    border-radius: 12px 12px 0 0;
+    background: #f8f9fa;
+}
+
+.column-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+.column-count {
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 12px;
+    min-width: 24px;
+    text-align: center;
+}
+
+.column-content {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.empty-column {
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+    padding: 30px 0;
+}
+
+/* Cards */
+.kanban-card {
+    background: white;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.kanban-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.job-number {
+    font-weight: 700;
+    font-size: 13px;
+    color: #667eea;
+}
+
+.priority-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.card-body {
+    font-size: 13px;
+}
+
+.product-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.order-ref,
+.assignee,
+.due-date {
+    color: #666;
+    margin: 4px 0;
+    font-size: 12px;
+}
+
+/* Card Actions */
+.card-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+}
+
+.btn-move {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.btn-move.prev {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.btn-move.prev:hover {
+    background: #e0e0e0;
+}
+
+.btn-move.next {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-move.next:hover {
+    transform: scale(1.05);
+}
+
+.btn-reject {
+    padding: 8px 12px;
+    background: #fee2e2;
+    color: #991b1b;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.btn-reject:hover {
+    background: #fecaca;
+}
+
+/* Scrollbar */
+.column-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.column-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.column-content::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+}
+
+.column-content::-webkit-scrollbar-thumb:hover {
+    background: #999;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .kanban-column {
+        flex: 0 0 240px;
+    }
+}
+
+/* Last Update */
+.last-update {
+    font-size: 12px;
+    color: #999;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+/* Job Notes */
+.job-notes {
+    margin-top: 8px;
+    padding: 8px;
+    background: #fef3c7;
+    border-radius: 6px;
+    font-size: 11px;
+    color: #92400e;
+}
+
+/* Reject Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.reject-modal {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    width: 100%;
+    max-width: 450px;
+    animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.reject-modal h2 {
+    margin: 0 0 16px 0;
+    font-size: 22px;
+    color: #991b1b;
+}
+
+.reject-modal .job-ref {
+    font-size: 14px;
+    color: #333;
+    margin: 0 0 4px 0;
+}
+
+.reject-modal .product-ref {
+    font-size: 16px;
+    font-weight: 600;
+    color: #667eea;
+    margin: 0 0 20px 0;
+}
+
+.reject-modal .form-group {
+    margin-bottom: 20px;
+}
+
+.reject-modal .form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.reject-modal .form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.reject-modal .form-group textarea:focus {
+    outline: none;
+    border-color: #ef4444;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-cancel {
+    flex: 1;
+    padding: 12px;
+    background: #f5f5f5;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-confirm-reject {
+    flex: 1;
+    padding: 12px;
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.btn-confirm-reject:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

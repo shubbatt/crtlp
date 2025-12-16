@@ -1,0 +1,192 @@
+.quotations-list {
+    padding: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+@media (max-width: 768px) {
+    .quotations-list {
+        padding: 20px 16px;
+    }
+
+    .quotations-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .quotations-header h1 {
+        font-size: 24px;
+    }
+
+    .quotations-table {
+        overflow-x: auto;
+    }
+
+    .quotations-table table {
+        min-width: 600px;
+    }
+
+    .quotations-table th,
+    .quotations-table td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+}
+
+.quotations-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.quotations-header h1 {
+    font-size: 28px;
+    color: #333;
+    margin: 0 0 24px 0;
+    font-weight: 600;
+}
+
+.btn-new {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: transform 0.2s;
+}
+
+.btn-new:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.filters {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.filter-select {
+    padding: 10px 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+}
+
+.btn-refresh {
+    padding: 10px 20px;
+    background: #f5f5f5;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.btn-refresh:hover {
+    background: #e5e5e5;
+}
+
+.quotations-table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.quotations-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.quotations-table th {
+    text-align: left;
+    padding: 16px;
+    background: #f8f9fa;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #666;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.quotations-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.quotations-table tr:hover {
+    background: #f8f9fa;
+}
+
+.quotations-table tr.expired-row {
+    background: #fef2f2;
+}
+
+.quote-number {
+    font-family: monospace;
+    font-weight: 600;
+    color: #667eea;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: white;
+}
+
+.amount {
+    font-weight: 600;
+}
+
+.date {
+    font-size: 13px;
+    color: #666;
+}
+
+.date.expired {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+.btn-view, .btn-convert {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-right: 6px;
+}
+
+.btn-view {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.btn-view:hover {
+    background: #c7d2fe;
+}
+
+.btn-convert {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.btn-convert:hover {
+    background: #a7f3d0;
+}
+
+.loading, .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+    font-size: 16px;
+}
+
