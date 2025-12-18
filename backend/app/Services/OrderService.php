@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use App\Models\User;
 use App\Models\Customer;
 use App\Models\Payment;
+use App\Models\Setting;
 use App\Services\InvoiceService;
 use Illuminate\Support\Facades\DB;
 
@@ -300,7 +301,10 @@ class OrderService
     {
         $subtotal = $order->items->sum('line_total');
         $discount = $order->discount ?? 0;
-        $taxRate = 0.10; // 10% tax (make configurable)
+        
+        // Get tax rate from settings, default to 10%
+        $taxRatePercentage = Setting::where('key', 'tax_rate')->value('value') ?? 10;
+        $taxRate = $taxRatePercentage / 100;
         
         $afterDiscount = $subtotal - $discount;
         $tax = $afterDiscount * $taxRate;

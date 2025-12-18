@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\PricingController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\SettingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -112,5 +113,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('reports/invoice-details', [ReportController::class, 'invoiceDetails']);
     Route::get('reports/orders-details', [ReportController::class, 'ordersDetails']);
     Route::get('reports/quotations', [ReportController::class, 'quotations']);
+    
+    // Settings
+    Route::get('settings', [SettingController::class, 'index']);
+    Route::post('settings', [SettingController::class, 'update']);
     
 });

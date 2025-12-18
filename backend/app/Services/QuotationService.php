@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Quotation;
 use App\Models\QuotationItem;
 use App\Models\Order;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\OrderService;
 use Illuminate\Support\Facades\DB;
@@ -151,7 +152,8 @@ class QuotationService
         
         $subtotal = $quotation->items->sum('line_total');
         $discount = $quotation->discount ?? 0;
-        $tax = ($subtotal - $discount) * 0.1; // 10% tax
+        $taxRate = (Setting::where('key', 'tax_rate')->value('value') ?? 10) / 100;
+        $tax = ($subtotal - $discount) * $taxRate;
         $total = $subtotal - $discount + $tax;
 
         $quotation->update([

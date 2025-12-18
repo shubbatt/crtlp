@@ -61,6 +61,7 @@ const OrderEntry: React.FC = () => {
     const [submitting, setSubmitting] = useState(false);
     const [calculatedPrice, setCalculatedPrice] = useState<{ unit_price: number, line_total: number } | null>(null);
     const [priceOverride, setPriceOverride] = useState<{ unit_price?: number; enabled: boolean }>({ enabled: false });
+    const [taxRate, setTaxRate] = useState(10); // Default 10%
 
     // Payment modal state
     const [showPayment, setShowPayment] = useState(false);
@@ -72,7 +73,19 @@ const OrderEntry: React.FC = () => {
 
     useEffect(() => {
         fetchProducts();
+        fetchSettings();
     }, []);
+
+    const fetchSettings = async () => {
+        try {
+            const { data } = await apiClient.get('/settings');
+            if (data && data.tax_rate) {
+                setTaxRate(parseFloat(data.tax_rate));
+            }
+        } catch (error) {
+            console.error('Failed to fetch settings:', error);
+        }
+    };
 
     // Search customers when search term changes
     useEffect(() => {
@@ -123,9 +136,9 @@ const OrderEntry: React.FC = () => {
         const availableCredit = Number(selectedCustomer.credit_limit || 0) - Number(selectedCustomer.credit_balance || 0);
 
         if (total > availableCredit) {
-            return { 
-                can: false, 
-                reason: `Order total (${formatCurrency(total)}) exceeds available credit (${formatCurrency(availableCredit)})` 
+            return {
+                can: false,
+                reason: `Order total (${formatCurrency(total)}) exceeds available credit (${formatCurrency(availableCredit)})`
             };
         }
 
@@ -169,10 +182,10 @@ const OrderEntry: React.FC = () => {
         if (!selectedProduct || !calculatedPrice) return;
 
         // Use override price if enabled, otherwise use calculated price
-        const finalUnitPrice = priceOverride.enabled && priceOverride.unit_price !== undefined 
-            ? priceOverride.unit_price 
+        const finalUnitPrice = priceOverride.enabled && priceOverride.unit_price !== undefined
+            ? priceOverride.unit_price
             : calculatedPrice.unit_price;
-        
+
         // Calculate line total based on final unit price
         let finalLineTotal: number;
         if (selectedProduct.type === 'dimension' && width > 0 && height > 0) {
@@ -237,8 +250,8 @@ const OrderEntry: React.FC = () => {
                 payment_terms: orderType === 'invoice' ? 'credit_30' : 'immediate',
                 items: cart.map(item => {
                     // Check if price was overridden
-                    const isOverridden = item.original_unit_price !== undefined && 
-                                       Math.abs(item.unit_price - item.original_unit_price) > 0.01;
+                    const isOverridden = item.original_unit_price !== undefined &&
+                        Math.abs(item.unit_price - item.original_unit_price) > 0.01;
                     return {
                         product_id: item.product.id,
                         quantity: item.quantity,
@@ -270,7 +283,7 @@ const OrderEntry: React.FC = () => {
             // Fetch order with customer details
             const orderResponse = await apiClient.get(`/orders/${data.id}`);
             const orderWithCustomer = orderResponse.data;
-            
+
             // Show payment modal for walk-in orders
             // Don't clear cart yet - only clear after successful payment
             setCreatedOrder({
@@ -318,7 +331,7 @@ const OrderEntry: React.FC = () => {
             // Payment recording will auto-update status to PAID if from DRAFT
             // Now move to production or ready/delivered based on requirements
             const isWalkInReadyToPick = !createdOrderCustomer && !requiresProduction;
-            
+
             if (requiresProduction) {
                 // Move to production - this creates service jobs
                 await apiClient.patch(API_ENDPOINTS.ORDER_STATUS(createdOrder.id), {
@@ -378,7 +391,7 @@ const OrderEntry: React.FC = () => {
                     const customerResponse = await apiClient.get(`/customers/${createdOrderCustomer.id}`);
                     const updatedCustomer = customerResponse.data;
                     setCreatedOrderCustomer(updatedCustomer);
-                    
+
                     // Update selected customer in the form if it's the same
                     if (selectedCustomer?.id === updatedCustomer.id) {
                         setSelectedCustomer(updatedCustomer);
@@ -440,12 +453,12 @@ const OrderEntry: React.FC = () => {
             <div className="order-entry-header">
                 <h1>🛒 New Order</h1>
             </div>
-            
+
             {/* Customer & Order Type Selection */}
-            <div className="customer-selection-section" style={{ 
-                background: 'white', 
-                padding: '20px', 
-                marginBottom: '20px', 
+            <div className="customer-selection-section" style={{
+                background: 'white',
+                padding: '20px',
+                marginBottom: '20px',
                 borderRadius: '12px',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
             }}>
@@ -610,17 +623,17 @@ const OrderEntry: React.FC = () => {
                         </select>
                     </div>
                 </div>
-                
+
                 {selectedCustomer && selectedCustomer.type === 'credit' && (
-                    <div style={{ 
-                        padding: '12px', 
-                        background: '#f0f9ff', 
+                    <div style={{
+                        padding: '12px',
+                        background: '#f0f9ff',
                         borderRadius: '8px',
                         border: '1px solid #bae6fd'
                     }}>
-                        <div style={{ 
-                            display: 'flex', 
-                            alignItems: 'center', 
+                        <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
                             marginBottom: '10px',
                             paddingBottom: '8px',
                             borderBottom: '1px solid #bae6fd'
@@ -641,7 +654,7 @@ const OrderEntry: React.FC = () => {
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                             <span style={{ fontWeight: '500' }}>Available Credit:</span>
-                            <span style={{ 
+                            <span style={{
                                 color: (Number(selectedCustomer.credit_limit || 0) - Number(selectedCustomer.credit_balance || 0)) < getTotal() ? '#ef4444' : '#10b981',
                                 fontWeight: '600',
                                 fontSize: '15px'
@@ -656,16 +669,16 @@ const OrderEntry: React.FC = () => {
                             </div>
                         )}
                         {cart.length > 0 && (
-                            <div style={{ 
-                                marginTop: '10px', 
-                                padding: '10px', 
-                                background: getTotal() > (Number(selectedCustomer.credit_limit || 0) - Number(selectedCustomer.credit_balance || 0)) 
-                                    ? '#fee2e2' 
+                            <div style={{
+                                marginTop: '10px',
+                                padding: '10px',
+                                background: getTotal() > (Number(selectedCustomer.credit_limit || 0) - Number(selectedCustomer.credit_balance || 0))
+                                    ? '#fee2e2'
                                     : '#d1fae5',
                                 borderRadius: '6px',
                                 fontSize: '12px',
-                                color: getTotal() > (Number(selectedCustomer.credit_limit || 0) - Number(selectedCustomer.credit_balance || 0)) 
-                                    ? '#991b1b' 
+                                color: getTotal() > (Number(selectedCustomer.credit_limit || 0) - Number(selectedCustomer.credit_balance || 0))
+                                    ? '#991b1b'
                                     : '#065f46',
                                 border: `1px solid ${getTotal() > (Number(selectedCustomer.credit_limit || 0) - Number(selectedCustomer.credit_balance || 0)) ? '#fca5a5' : '#86efac'}`
                             }}>
@@ -850,12 +863,12 @@ const OrderEntry: React.FC = () => {
                                     <span>{formatCurrency(getTotal())}</span>
                                 </div>
                                 <div className="summary-row">
-                                    <span>Tax (10%):</span>
-                                    <span>{formatCurrency(getTotal() * 0.1)}</span>
+                                    <span>Tax ({taxRate}%):</span>
+                                    <span>{formatCurrency(getTotal() * (taxRate / 100))}</span>
                                 </div>
                                 <div className="summary-row grand-total">
                                     <span>Total:</span>
-                                    <span>{formatCurrency(getTotal() * 1.1)}</span>
+                                    <span>{formatCurrency(getTotal() * (1 + taxRate / 100))}</span>
                                 </div>
                             </div>
 
@@ -864,10 +877,10 @@ const OrderEntry: React.FC = () => {
                                 onClick={submitOrder}
                                 disabled={submitting}
                             >
-                                {submitting 
-                                    ? 'Creating Order...' 
-                                    : orderType === 'invoice' 
-                                        ? '✅ Create Invoice' 
+                                {submitting
+                                    ? 'Creating Order...'
+                                    : orderType === 'invoice'
+                                        ? '✅ Create Invoice'
                                         : '✅ Checkout & Pay'}
                             </button>
                         </>
@@ -887,7 +900,7 @@ const OrderEntry: React.FC = () => {
                     amount={createdOrder.total}
                     orderNumber={createdOrder.order_number}
                     title="Order Created!"
-                    subtitle={createdOrderCustomer && createdOrderCustomer.type === 'credit' 
+                    subtitle={createdOrderCustomer && createdOrderCustomer.type === 'credit'
                         ? `💳 Credit Customer: ${createdOrderCustomer.name} | Available Credit: ${formatCurrency(Number(createdOrderCustomer.credit_limit || 0) - Number(createdOrderCustomer.credit_balance || 0))}`
                         : undefined}
                     showPayLater={!(!createdOrderCustomer && !requiresProduction)}
@@ -896,8 +909,8 @@ const OrderEntry: React.FC = () => {
                     requiresProduction={requiresProduction}
                     onProductionToggle={setRequiresProduction}
                     payLaterButtonText="Pay Later"
-                    submitButtonText={!createdOrderCustomer && !requiresProduction 
-                        ? 'Complete & Deliver' 
+                    submitButtonText={!createdOrderCustomer && !requiresProduction
+                        ? 'Complete & Deliver'
                         : 'Pay Now & Complete'}
                 />
             )}

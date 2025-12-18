@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Invoice;
 use App\Models\Order;
 use App\Models\Customer;
+use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
 
 class InvoiceService
@@ -71,8 +72,8 @@ class InvoiceService
                 // Calculate subtotal from items excluding cancelled job items
                 $includedItems = $order->items()->whereNotIn('id', $cancelledJobItemIds)->get();
                 $subtotal = $includedItems->sum('line_total');
-                $discount = $order->discount ?? 0;
-                $tax = ($subtotal - $discount) * 0.1; // 10% tax
+                $taxRate = (Setting::where('key', 'tax_rate')->value('value') ?? 10) / 100;
+                $tax = ($subtotal - $discount) * $taxRate;
                 $total = $subtotal - $discount + $tax;
                 
                 // Use calculated totals for invoice
@@ -218,7 +219,8 @@ class InvoiceService
             }
             
             $orderDiscount = $data['discount'] ?? $invoice->discount ?? 0;
-            $tax = (($subtotal - $orderDiscount) * 0.1); // 10% tax
+            $taxRate = (Setting::where('key', 'tax_rate')->value('value') ?? 10) / 100;
+            $tax = (($subtotal - $orderDiscount) * $taxRate);
             $total = $subtotal - $orderDiscount + $tax;
             
             $invoice->update([
@@ -233,7 +235,8 @@ class InvoiceService
             // Legacy: update totals directly
             $subtotal = $data['subtotal'] ?? $invoice->subtotal;
             $discount = $data['discount'] ?? $invoice->discount ?? 0;
-            $tax = $data['tax'] ?? (($subtotal - $discount) * 0.1); // 10% tax
+            $taxRate = (Setting::where('key', 'tax_rate')->value('value') ?? 10) / 100;
+            $tax = $data['tax'] ?? (($subtotal - $discount) * $taxRate);
             $total = $subtotal - $discount + $tax;
 
             $invoice->update([

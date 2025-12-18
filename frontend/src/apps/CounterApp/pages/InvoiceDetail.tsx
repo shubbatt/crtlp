@@ -27,7 +27,7 @@ interface Invoice {
     }>;
     customer?: { id: number; name: string; email: string; phone: string };
     outlet?: { id: number; name: string; code: string; address?: string; phone?: string; email?: string };
-    order?: { 
+    order?: {
         id: number;
         order_number: string;
         items?: Array<{
@@ -61,6 +61,7 @@ const InvoiceDetail: React.FC = () => {
     const [draftDiscount, setDraftDiscount] = useState(0);
     const [draftTax, setDraftTax] = useState(0);
     const [savingDraft, setSavingDraft] = useState(false);
+    const [taxRate, setTaxRate] = useState(10); // Default 10%
     const [approving, setApproving] = useState(false);
     const [itemEdits, setItemEdits] = useState<Record<number, {
         unit_price: number;
@@ -72,6 +73,7 @@ const InvoiceDetail: React.FC = () => {
         if (id) {
             fetchInvoice();
         }
+        fetchSettings();
         // Get current user from localStorage or API
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
@@ -82,13 +84,13 @@ const InvoiceDetail: React.FC = () => {
                 // If parsing fails, try to get from API
                 apiClient.get(API_ENDPOINTS.ME).then(({ data }) => {
                     setCurrentUser(data);
-                }).catch(() => {});
+                }).catch(() => { });
             }
         } else {
             // Try to get from API
             apiClient.get(API_ENDPOINTS.ME).then(({ data }) => {
                 setCurrentUser(data);
-            }).catch(() => {});
+            }).catch(() => { });
         }
     }, [id]);
 
@@ -111,9 +113,20 @@ const InvoiceDetail: React.FC = () => {
         setLoading(false);
     };
 
+    const fetchSettings = async () => {
+        try {
+            const { data } = await apiClient.get('/settings');
+            if (data && data.tax_rate) {
+                setTaxRate(parseFloat(data.tax_rate));
+            }
+        } catch (error) {
+            console.error('Failed to fetch settings:', error);
+        }
+    };
+
     const handleUpdatePO = async () => {
         if (!invoice) return;
-        
+
         try {
             await apiClient.put(API_ENDPOINTS.INVOICE_UPDATE(invoice.id), {
                 purchase_order_number: poNumber || null,
@@ -179,10 +192,10 @@ const InvoiceDetail: React.FC = () => {
     const calculateItemLineTotal = (item: any, itemId: number) => {
         const edit = itemEdits[itemId];
         if (!edit) return item.line_total;
-        
+
         const baseTotal = edit.unit_price * item.quantity;
         let discountAmount = 0;
-        
+
         if (edit.discount_value > 0) {
             if (edit.discount_type === 'percentage') {
                 discountAmount = baseTotal * (edit.discount_value / 100);
@@ -190,28 +203,28 @@ const InvoiceDetail: React.FC = () => {
                 discountAmount = edit.discount_value;
             }
         }
-        
+
         return baseTotal - discountAmount;
     };
 
     const calculateTotals = () => {
         if (!invoice?.order?.items) return { subtotal: 0, tax: 0, total: 0 };
-        
+
         let subtotal = 0;
         invoice.order.items.forEach((item) => {
             subtotal += calculateItemLineTotal(item, item.id);
         });
-        
+
         const discount = draftDiscount;
-        const tax = (subtotal - discount) * 0.1;
+        const tax = (subtotal - discount) * (taxRate / 100);
         const total = subtotal - discount + tax;
-        
+
         return { subtotal, tax, total };
     };
 
     const handleSaveDraft = async () => {
         if (!invoice) return;
-        
+
         setSavingDraft(true);
         try {
             // Build item_overrides object
@@ -251,7 +264,7 @@ const InvoiceDetail: React.FC = () => {
 
     const handleApproveDraft = async () => {
         if (!invoice) return;
-        
+
         if (!confirm('Are you sure you want to approve this draft invoice? Once approved, it will be issued and customer credit balance will be updated.')) {
             return;
         }
@@ -304,7 +317,7 @@ const InvoiceDetail: React.FC = () => {
                     <div className="info-grid">
                         <div className="info-item">
                             <label>Status</label>
-                            <span 
+                            <span
                                 className="status-badge"
                                 style={{ backgroundColor: getStatusColor(invoice.status) }}
                             >
@@ -325,7 +338,7 @@ const InvoiceDetail: React.FC = () => {
                         {invoice.order && (
                             <div className="info-item">
                                 <label>Order Number</label>
-                                <span 
+                                <span
                                     style={{ cursor: 'pointer', color: '#667eea' }}
                                     onClick={() => navigate(`/counter/orders/${invoice.order?.id}`)}
                                 >
@@ -361,7 +374,7 @@ const InvoiceDetail: React.FC = () => {
                                     </button>
                                 </div>
                             ) : (
-                                <span 
+                                <span
                                     style={{ cursor: 'pointer', color: invoice.purchase_order_number ? '#333' : '#999' }}
                                     onClick={() => setEditingPO(true)}
                                     title="Click to edit"
@@ -413,10 +426,10 @@ const InvoiceDetail: React.FC = () => {
                             <tbody>
                                 {invoice.order.items.map((item, index) => {
                                     const edit = itemEdits[item.id] || { unit_price: item.unit_price, discount_type: 'fixed' as const, discount_value: 0 };
-                                    const lineTotal = isEditingDraft && invoice.status === 'draft' 
+                                    const lineTotal = isEditingDraft && invoice.status === 'draft'
                                         ? calculateItemLineTotal(item, item.id)
                                         : item.line_total;
-                                    
+
                                     return (
                                         <tr key={index}>
                                             <td>{item.description}</td>
@@ -458,8 +471,8 @@ const InvoiceDetail: React.FC = () => {
                                                             onChange={(e) => {
                                                                 setItemEdits({
                                                                     ...itemEdits,
-                                                                    [item.id]: { 
-                                                                        ...edit, 
+                                                                    [item.id]: {
+                                                                        ...edit,
                                                                         discount_type: e.target.value as 'percentage' | 'fixed',
                                                                         discount_value: 0
                                                                     }
@@ -563,7 +576,7 @@ const InvoiceDetail: React.FC = () => {
                                     />
                                 </div>
                                 <div className="summary-row">
-                                    <span>Tax (10%):</span>
+                                    <span>Tax ({taxRate}%):</span>
                                     <span>{formatCurrency(calculateTotals().tax)}</span>
                                 </div>
                                 <div className="summary-row grand-total">
@@ -694,7 +707,7 @@ const InvoiceDetail: React.FC = () => {
                 <div className="detail-actions">
                     {invoice.status === 'draft' ? (
                         <>
-                            <button 
+                            <button
                                 className="btn-approve"
                                 onClick={handleApproveDraft}
                                 disabled={approving || isEditingDraft}
@@ -711,9 +724,9 @@ const InvoiceDetail: React.FC = () => {
                             >
                                 {approving ? 'Approving...' : '✅ Approve & Issue Invoice'}
                             </button>
-                            <div style={{ 
-                                padding: '12px 16px', 
-                                background: '#fef3c7', 
+                            <div style={{
+                                padding: '12px 16px',
+                                background: '#fef3c7',
                                 border: '1px solid #fbbf24',
                                 borderRadius: '6px',
                                 color: '#92400e',
@@ -724,20 +737,20 @@ const InvoiceDetail: React.FC = () => {
                         </>
                     ) : (
                         <>
-                            <button 
+                            <button
                                 className="btn-print"
                                 onClick={handlePrintInvoice}
                             >
                                 🖨️ Print Invoice
                             </button>
-                            <button 
+                            <button
                                 className="btn-print"
                                 onClick={handlePrintDeliveryNote}
                             >
                                 📦 Print Delivery Note
                             </button>
                             {Number(invoice.balance || 0) > 0 && (
-                                <button 
+                                <button
                                     className="btn-payment"
                                     onClick={() => setShowPaymentModal(true)}
                                 >

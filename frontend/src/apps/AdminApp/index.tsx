@@ -68,6 +68,14 @@ const AdminApp: React.FC = () => {
         phone: '',
         email: '',
     });
+    const [systemSettings, setSystemSettings] = useState({
+        tax_rate: '10',
+        receipt_header: 'Thank you for your order!',
+        receipt_footer: 'Visit us again soon!',
+        email_orders: 'true',
+        email_ready: 'true',
+        low_stock: 'false',
+    });
 
     useEffect(() => {
         if (activeTab === 'products') {
@@ -76,6 +84,7 @@ const AdminApp: React.FC = () => {
         }
         if (activeTab === 'settings') {
             fetchOutlets();
+            fetchSettings();
             // Load currency settings
             try {
                 const stored = localStorage.getItem('currency_settings');
@@ -129,6 +138,26 @@ const AdminApp: React.FC = () => {
             alert('✅ Outlet updated successfully!');
         } catch (error: any) {
             alert('Failed to update outlet: ' + (error.response?.data?.error || error.message));
+        }
+    };
+
+    const fetchSettings = async () => {
+        try {
+            const { data } = await apiClient.get('/settings');
+            if (data && Object.keys(data).length > 0) {
+                setSystemSettings(prev => ({ ...prev, ...data }));
+            }
+        } catch (error) {
+            console.error('Failed to fetch settings:', error);
+        }
+    };
+
+    const saveSettings = async () => {
+        try {
+            await apiClient.post('/settings', systemSettings);
+            alert('✅ Settings saved successfully!');
+        } catch (error: any) {
+            alert('Failed to save settings: ' + (error.response?.data?.error || error.message));
         }
     };
 
@@ -220,7 +249,7 @@ const AdminApp: React.FC = () => {
             } catch (error: any) {
                 alert('Failed to update product: ' + (error.response?.data?.error || error.message));
             }
-        } 
+        }
         // If adding new product
         else if (showAddModal) {
             if (!sku || !editForm.name || !editForm.unit_cost) {
@@ -400,10 +429,10 @@ const AdminApp: React.FC = () => {
                                 <h3>🏢 Branch/Outlet Management</h3>
                                 <div style={{ marginBottom: '20px' }}>
                                     {outlets.map((outlet) => (
-                                        <div key={outlet.id} style={{ 
-                                            padding: '15px', 
-                                            marginBottom: '10px', 
-                                            border: '1px solid #e0e0e0', 
+                                        <div key={outlet.id} style={{
+                                            padding: '15px',
+                                            marginBottom: '10px',
+                                            border: '1px solid #e0e0e0',
                                             borderRadius: '8px',
                                             display: 'flex',
                                             justifyContent: 'space-between',
@@ -415,7 +444,7 @@ const AdminApp: React.FC = () => {
                                                 {outlet.phone && <div style={{ fontSize: '12px', color: '#666' }}>Phone: {outlet.phone}</div>}
                                                 {outlet.email && <div style={{ fontSize: '12px', color: '#666' }}>Email: {outlet.email}</div>}
                                             </div>
-                                            <button 
+                                            <button
                                                 className="btn-edit"
                                                 onClick={() => openEditOutlet(outlet)}
                                             >
@@ -430,11 +459,15 @@ const AdminApp: React.FC = () => {
                                 <h3>🏪 Store Information</h3>
                                 <div className="setting-row">
                                     <label>Tax Rate (%)</label>
-                                    <input type="number" defaultValue="10" />
+                                    <input
+                                        type="number"
+                                        value={systemSettings.tax_rate}
+                                        onChange={(e) => setSystemSettings({ ...systemSettings, tax_rate: e.target.value })}
+                                    />
                                 </div>
                                 <div className="setting-row">
                                     <label>Currency</label>
-                                    <select 
+                                    <select
                                         value={currencySettings.code}
                                         onChange={(e) => {
                                             const currencyMap: Record<string, { symbol: string; code: string; name: string }> = {
@@ -458,8 +491,8 @@ const AdminApp: React.FC = () => {
                                 </div>
                                 <div className="setting-row">
                                     <label>Decimal Places</label>
-                                    <input 
-                                        type="number" 
+                                    <input
+                                        type="number"
                                         min="0"
                                         max="4"
                                         value={currencySettings.decimals}
@@ -475,15 +508,30 @@ const AdminApp: React.FC = () => {
                             <div className="setting-card">
                                 <h3>📧 Notifications</h3>
                                 <div className="setting-row checkbox">
-                                    <input type="checkbox" id="email-orders" defaultChecked />
+                                    <input
+                                        type="checkbox"
+                                        id="email-orders"
+                                        checked={systemSettings.email_orders === 'true'}
+                                        onChange={(e) => setSystemSettings({ ...systemSettings, email_orders: e.target.checked ? 'true' : 'false' })}
+                                    />
                                     <label htmlFor="email-orders">Email on new orders</label>
                                 </div>
                                 <div className="setting-row checkbox">
-                                    <input type="checkbox" id="email-ready" defaultChecked />
+                                    <input
+                                        type="checkbox"
+                                        id="email-ready"
+                                        checked={systemSettings.email_ready === 'true'}
+                                        onChange={(e) => setSystemSettings({ ...systemSettings, email_ready: e.target.checked ? 'true' : 'false' })}
+                                    />
                                     <label htmlFor="email-ready">Email when order ready</label>
                                 </div>
                                 <div className="setting-row checkbox">
-                                    <input type="checkbox" id="low-stock" />
+                                    <input
+                                        type="checkbox"
+                                        id="low-stock"
+                                        checked={systemSettings.low_stock === 'true'}
+                                        onChange={(e) => setSystemSettings({ ...systemSettings, low_stock: e.target.checked ? 'true' : 'false' })}
+                                    />
                                     <label htmlFor="low-stock">Low stock alerts</label>
                                 </div>
                             </div>
@@ -492,87 +540,95 @@ const AdminApp: React.FC = () => {
                                 <h3>🖨️ Receipt Settings</h3>
                                 <div className="setting-row">
                                     <label>Receipt Header</label>
-                                    <textarea defaultValue="Thank you for your order!" rows={3} />
+                                    <textarea
+                                        value={systemSettings.receipt_header}
+                                        onChange={(e) => setSystemSettings({ ...systemSettings, receipt_header: e.target.value })}
+                                        rows={3}
+                                    />
                                 </div>
                                 <div className="setting-row">
                                     <label>Receipt Footer</label>
-                                    <textarea defaultValue="Visit us again soon!" rows={3} />
+                                    <textarea
+                                        value={systemSettings.receipt_footer}
+                                        onChange={(e) => setSystemSettings({ ...systemSettings, receipt_footer: e.target.value })}
+                                        rows={3}
+                                    />
                                 </div>
                             </div>
                         </div>
-                        <button className="btn-save">💾 Save Settings</button>
+                        <button className="btn-save" onClick={saveSettings}>💾 Save Settings</button>
                     </div>
                 )}
 
-            {/* Edit Outlet Modal */}
-            {editingOutlet && (
-                <div className="modal-overlay" onClick={closeEditOutlet}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <h2>✏️ Edit Outlet: {editingOutlet.name}</h2>
-                        
-                        <div className="form-group">
-                            <label>Outlet Name *</label>
-                            <input
-                                type="text"
-                                value={outletForm.name}
-                                onChange={(e) => setOutletForm({ ...outletForm, name: e.target.value })}
-                                placeholder="Outlet name"
-                            />
-                        </div>
+                {/* Edit Outlet Modal */}
+                {editingOutlet && (
+                    <div className="modal-overlay" onClick={closeEditOutlet}>
+                        <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                            <h2>✏️ Edit Outlet: {editingOutlet.name}</h2>
 
-                        <div className="form-group">
-                            <label>Outlet Code *</label>
-                            <input
-                                type="text"
-                                value={outletForm.code}
-                                onChange={(e) => setOutletForm({ ...outletForm, code: e.target.value.toUpperCase() })}
-                                placeholder="e.g., CP-HIT"
-                                style={{ textTransform: 'uppercase' }}
-                            />
-                            <small className="form-hint">Unique code for this outlet</small>
-                        </div>
+                            <div className="form-group">
+                                <label>Outlet Name *</label>
+                                <input
+                                    type="text"
+                                    value={outletForm.name}
+                                    onChange={(e) => setOutletForm({ ...outletForm, name: e.target.value })}
+                                    placeholder="Outlet name"
+                                />
+                            </div>
 
-                        <div className="form-group">
-                            <label>Address</label>
-                            <textarea
-                                value={outletForm.address}
-                                onChange={(e) => setOutletForm({ ...outletForm, address: e.target.value })}
-                                placeholder="Full address"
-                                rows={3}
-                            />
-                        </div>
+                            <div className="form-group">
+                                <label>Outlet Code *</label>
+                                <input
+                                    type="text"
+                                    value={outletForm.code}
+                                    onChange={(e) => setOutletForm({ ...outletForm, code: e.target.value.toUpperCase() })}
+                                    placeholder="e.g., CP-HIT"
+                                    style={{ textTransform: 'uppercase' }}
+                                />
+                                <small className="form-hint">Unique code for this outlet</small>
+                            </div>
 
-                        <div className="form-group">
-                            <label>Phone</label>
-                            <input
-                                type="text"
-                                value={outletForm.phone}
-                                onChange={(e) => setOutletForm({ ...outletForm, phone: e.target.value })}
-                                placeholder="Phone number"
-                            />
-                        </div>
+                            <div className="form-group">
+                                <label>Address</label>
+                                <textarea
+                                    value={outletForm.address}
+                                    onChange={(e) => setOutletForm({ ...outletForm, address: e.target.value })}
+                                    placeholder="Full address"
+                                    rows={3}
+                                />
+                            </div>
 
-                        <div className="form-group">
-                            <label>Email</label>
-                            <input
-                                type="email"
-                                value={outletForm.email}
-                                onChange={(e) => setOutletForm({ ...outletForm, email: e.target.value })}
-                                placeholder="Email address"
-                            />
-                        </div>
+                            <div className="form-group">
+                                <label>Phone</label>
+                                <input
+                                    type="text"
+                                    value={outletForm.phone}
+                                    onChange={(e) => setOutletForm({ ...outletForm, phone: e.target.value })}
+                                    placeholder="Phone number"
+                                />
+                            </div>
 
-                        <div className="modal-actions">
-                            <button className="btn-cancel" onClick={closeEditOutlet}>
-                                Cancel
-                            </button>
-                            <button className="btn-save" onClick={saveOutlet}>
-                                💾 Save Changes
-                            </button>
+                            <div className="form-group">
+                                <label>Email</label>
+                                <input
+                                    type="email"
+                                    value={outletForm.email}
+                                    onChange={(e) => setOutletForm({ ...outletForm, email: e.target.value })}
+                                    placeholder="Email address"
+                                />
+                            </div>
+
+                            <div className="modal-actions">
+                                <button className="btn-cancel" onClick={closeEditOutlet}>
+                                    Cancel
+                                </button>
+                                <button className="btn-save" onClick={saveOutlet}>
+                                    💾 Save Changes
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
             </div>
 
             {/* Edit/Create Product Modal */}
@@ -580,7 +636,7 @@ const AdminApp: React.FC = () => {
                 <div className="modal-overlay" onClick={closeEditModal}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                         <h2>{editingProduct ? `✏️ Edit Product: ${editingProduct.sku}` : '➕ Add New Product'}</h2>
-                        
+
                         {!editingProduct && (
                             <>
                                 <div className="form-group">
